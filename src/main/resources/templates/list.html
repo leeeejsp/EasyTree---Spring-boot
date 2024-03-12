@@ -10,10 +10,11 @@
 			class="form-control mx-1 mt-2" placeholder="내용을 입력하세요."/>
 			<button type="submit" class="btn btn-primary mx-1 mt-2">검색</button>
 			<a class="btn btn-primary mx-1 mt-2" data-toggle="modal" href="#treeModal">트리보기</a>
-			<h5 class="mx-1 mt-3">총 000개 결과</h5>
+			<h5 class="mx-1 mt-3">총 <span th:text="${paging.totalElements}">000</span>개 결과</h5>
 		</form>
 		<!-- 서열 데이터 시작 -->
-		<div class="card bg-light mt-3">
+		
+		<div class="card bg-light mt-3" th:each="paging : ${paging}">
 			<div class="card-header bg-light">
 				<div class="row">
 					<div class="col-12 text-left">
@@ -21,11 +22,11 @@
 							<input class="form-check-input" type="checkbox" name="tree" value="" 
 							id="" onclick="inputCheckboxValue()"> 
 							<label class="form-check-label" for="flexCheckDefault">
-								<i>학명 들어갈 자리</i>
+								<i th:text="${paging.name.toString()}">학명 들어갈 자리</i>
 							</label>
 							&nbsp;
 							<small>
-								<a href="#">
+								<a href="#" th:text="${paging.ncbiCode}">
 									NCBI코드 들어갈 자리
 								</a>
 							</small>
@@ -35,7 +36,7 @@
 			</div>
 			<div class="card-body">
 				<p class="card-text">
-					<a href="#">FASTA 이름 들어갈 자리</a>
+					<a href="#" th:text="${paging.fastaTitle}">FASTA 이름 들어갈 자리</a>
 				</p>
 			</div> 
 		</div>
@@ -43,48 +44,41 @@
 				
 		<!-- 페이징 -->
 		<ul class="pagination justify-content-center mt-3">
-			<li class="page-item">
-				<a class="page-link" href="#">
+			<li class="page-item" th:classappend="${!paging.hasPrevious} ? 'disabled' : ''">
+				<a class="page-link" th:href="@{|?page=0|}">
 					처음
 				</a>
 			</li>
-			<li class="page-item">
-				<a class="page-link" href="#">
+			<li class="page-item" th:classappend="${startPage - 10 >= 1} ? '' : 'disabled'">
+				<a class="page-link" th:href="@{|?page=${startPage - 11}|}">
 					&lt;&lt;
 				</a>
 			</li>
-			<li class="page-item">
-				<a class="page-link" href="#">
+			<li class="page-item" th:classappend="${!paging.hasPrevious} ? 'disabled' : ''">
+				<a class="page-link" th:href="@{|?page=${paging.number-1}|}">
 					이전
 				</a>
 			</li>
-			<li class="page-item">
-				<a class="page-link" href="#">
+			<li class="page-item" th:each="page : ${#numbers.sequence(startPage, startPage+9)}"
+			th:classappend="${paging.number+1 == page} ? 'active' : ''">
+				<a class="page-link" th:if="${paging.totalPages >= page}"
+				th:href="@{|?page=${page-1}|}"
+				th:text="${page}">
 					1
 				</a>
 			</li>
-			<li class="page-item">
-				<a class="page-link" href="#">
-					2
-				</a>
-			</li>
-			<li class="page-item">
-				<a class="page-link" href="#">
-					3
-				</a>
-			</li>
-			<li class="page-item">
-				<a class="page-link" href="#">
+			<li class="page-item" th:classappend="${!paging.hasNext} ? 'disabled' : ''">
+				<a class="page-link" th:href="@{|?page=${paging.number+1}|}">
 					다음
 				</a>
 			</li>
-			<li class="page-item">
-				<a class="page-link" href="#">
+			<li class="page-item" th:classappend="${startPage + 10 >= paging.totalPages} ? 'disabled' : ''">
+				<a class="page-link" th:href="@{|?page=${startPage + 9}|}">
 					&gt;&gt;
 				</a>
 			</li>
-			<li class="page-item">
-				<a class="page-link" href="#">마지막</a>
+			<li class="page-item" th:classappend="${!paging.hasNext} ? 'disabled' : ''">
+				<a class="page-link" th:href="@{|?page=${paging.totalPages-1}|}">마지막</a>
 			</li>
 		</ul>
 		<!-- 페이징 끝 -->
