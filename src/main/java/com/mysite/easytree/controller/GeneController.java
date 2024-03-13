@@ -37,4 +37,9 @@ public class GeneController {
 		model.addAttribute("gene", gene);
 		return "detail";
 	}
+	
+	@GetMapping(value = "/create")
+	public String geneCreate() {
+		return "form/gene_form";
+	}
 }

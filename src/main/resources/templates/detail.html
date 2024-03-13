@@ -4,31 +4,27 @@
 	layout:decorate="~{layouts/layout1}">
 <div layout:fragment="content">
 	<section class="container">
-		<form method="get" action="" class="form-inline mt-3 mb-3">
-			<input style="width:60%;" type="text" name="search" class="form-control mx-1 mt-2" placeholder="내용을 입력하세요." >
-			<button type="submit" class="btn btn-primary mx-1 mt-2">검색</button>
-		</form>
-		<div class="card bg-light mt-3">
-			<div class="card-header bg-light">
-				<div class="row">
-					<div class="col-7 text-left"><i th:text="${gene.name.toString()}">학명 들어가는 자리</i>&nbsp;
-						<small><a th:href="@{|https://www.ncbi.nlm.nih.gov/protein/${gene.ncbiCode}|}"
-								th:text="${gene.ncbiCode}">
-								NCBI코드 들어가는 자리
-								</a>
-						</small>
-					</div>
-					<div class="col-5 text-right">
-						<small th:text="${#temporals.format(gene.registerDay, 'yyyy-MM-dd HH:mm')}">등록날짜 들어가는 자리&nbsp;</small>
+			<div class="card bg-light mt-3">
+				<div class="card-header bg-light">
+					<div class="row">
+						<div class="col-7 text-left"><i th:text="${gene.name.toString()}">학명 들어가는 자리</i>&nbsp;
+							<small><a th:href="@{|https://www.ncbi.nlm.nih.gov/protein/${gene.ncbiCode}|}"
+									th:text="${gene.ncbiCode}">
+									NCBI코드 들어가는 자리
+									</a>
+							</small>
+						</div>
+						<div class="col-5 text-right">
+							<small th:text="${#temporals.format(gene.registerDay, 'yyyy-MM-dd HH:mm')}">등록날짜 들어가는 자리&nbsp;</small>
+						</div>
 					</div>
 				</div>
+				<div class="card-body">
+					<p class="card-text">
+						<pre th:text="${gene.dnaSequence}">dna서열 들어가는 자리</pre>
+					</p>
+				</div> 
 			</div>
-			<div class="card-body">
-				<p class="card-text">
-					<pre th:text="${gene.dnaSequence}">dna서열 들어가는 자리</pre>
-				</p>
-			</div> 
-		</div>
 	</section>	
 </div>
 </html>

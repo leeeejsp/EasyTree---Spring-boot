@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/layout1}">
+<div layout:fragment="content">
+	<section class="container">
+		<form method="post" action="">
+			<div class="card bg-light mt-3">
+				<div class="card-header bg-light">
+					<div class="row">
+						<div class="col-7 text-left">
+							<label for="name" class="form-label">학명</label>
+							<input type="text" name="name" id="name" class="form-control"/>
+							<small>
+								<label for="ncbiCode" class="form-label">ncbi 코드</label>
+								<input type="text" name="ncbiCode" id="ncbiCode" class="form-control"/>
+							</small>
+						</div>
+					</div>
+				</div>
+				<div class="card-body">
+					<p class="card-text">
+						<label for="fastaTitle" class="form-label">fasta Title</label><br>
+						<input type="text" name="fastaTitle" style="width:100%;" id="fastaTitle" class="form-control"/>
+					</p>
+					<p class="card-text">
+						<label for="dnaSequence" class="form-label">dna 서열</label><br>
+						<textarea name="dnaSequence" style="width:100%; height:500px;" id="dnaSequence" class="form-control"></textarea>
+					</p>
+				</div> 
+				<input type="submit" value="등록" class="btn btn-primary"/>
+			</div>
+			
+		</form>
+	</section>
+</div>
+</html>
