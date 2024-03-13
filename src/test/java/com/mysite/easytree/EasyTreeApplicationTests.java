@@ -41,11 +41,11 @@ class EasyTreeApplicationTests {
 	@Test
 	void createGene() {
 		
-		for(int i=0; i<300; i++) {
+		for(int i=0; i<10; i++) {
 			String name = "Pinus Densiflora";
 			String dnaSequence = "abcdabcd";
 			String fastaTitle = "testTitle";
-			String ncbiCode = "testNcbiCode";
+			String ncbiCode = "testNcbiCode" + i;
 			
 			Optional<ScientificName> sciName = this.scientificNameRepository.findByName(name);
 			if(sciName.isPresent()) {

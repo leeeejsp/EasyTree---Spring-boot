@@ -26,7 +26,8 @@
 							</label>
 							&nbsp;
 							<small>
-								<a href="#" th:text="${paging.ncbiCode}">
+								<a th:href="@{|https://www.ncbi.nlm.nih.gov/protein/${paging.ncbiCode}|}"
+								 th:text="${paging.ncbiCode}">
 									NCBI코드 들어갈 자리
 								</a>
 							</small>
@@ -36,7 +37,7 @@
 			</div>
 			<div class="card-body">
 				<p class="card-text">
-					<a href="#" th:text="${paging.fastaTitle}">FASTA 이름 들어갈 자리</a>
+					<a th:href="@{|/list/${paging.ncbiCode}|}" th:text="${paging.fastaTitle}">FASTA 이름 들어갈 자리</a>
 				</p>
 			</div> 
 		</div>

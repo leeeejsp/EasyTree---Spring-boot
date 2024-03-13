@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.mysite.easytree.entity.Gene;
@@ -17,6 +18,7 @@ public class GeneController {
 
 	private final GeneService geneService;
 	
+
 	@GetMapping(value = "/list")
 	public String geneList(Model model,
 			@RequestParam(value = "page", defaultValue = "0") int page) {
@@ -26,5 +28,13 @@ public class GeneController {
 		int startPage = (page+1) - ((page+1) - 1) % 10;
 		model.addAttribute("startPage", startPage);
 		return "list";
+	}
+	
+	@GetMapping(value = "/list/{ncbiCode}")
+	public String geneDetail(Model model,
+			@PathVariable("ncbiCode") String ncbiCode) {
+		Gene gene = this.geneService.getGene(ncbiCode);
+		model.addAttribute("gene", gene);
+		return "detail";
 	}
 }

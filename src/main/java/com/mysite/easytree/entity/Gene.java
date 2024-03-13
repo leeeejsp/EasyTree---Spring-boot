@@ -21,6 +21,7 @@ public class Gene {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;
 	
+	@Column(unique = true)
 	private String ncbiCode;
 	
 	@Column(columnDefinition = "TEXT")

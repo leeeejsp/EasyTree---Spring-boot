@@ -3,6 +3,7 @@ package com.mysite.easytree.service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.mysite.easytree.Repository.GeneRepository;
 import com.mysite.easytree.data.GeneDTO;
 import com.mysite.easytree.entity.Gene;
+import com.mysite.easytree.exception.DataNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -34,7 +36,15 @@ public class GeneService {
 	}
 	
 	//읽기
-	
+	public Gene getGene(String ncbiCode) {
+		Optional<Gene> _gene = this.geneRepository.findByNcbiCode(ncbiCode);
+		if(_gene.isPresent()) {
+			Gene gene = _gene.get();
+			return gene;
+		}else {
+			throw new DataNotFoundException("Data is not found");
+		}
+	}
 	
 	//목록보기
 	public List<Gene> getGeneList(){
