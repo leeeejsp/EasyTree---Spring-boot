@@ -8,4 +8,5 @@ import com.mysite.easytree.entity.ScientificName;
 
 public interface ScientificNameRepository extends JpaRepository<ScientificName, Integer>{
 	Optional<ScientificName> findByName(String name);
+	
 }

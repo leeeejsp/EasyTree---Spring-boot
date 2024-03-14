@@ -11,4 +11,5 @@ import com.mysite.easytree.entity.Gene;
 public interface GeneRepository extends JpaRepository<Gene, Integer>{
 	Page<Gene> findAll(Pageable pageable);
 	Optional<Gene> findByNcbiCode(String ncbiCode);
+	boolean existsByNcbiCode(String ncbiCode);
 }

@@ -20,5 +20,9 @@ public class ScientificNameService {
 		this.scientificNameRepository.save(sciName);
 	}
 	
+	//생성 - 객체로 받았을 경우
+	public void createName(ScientificName name) {
+		this.scientificNameRepository.save(name);
+	}
 	
 }

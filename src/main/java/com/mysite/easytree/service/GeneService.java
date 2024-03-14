@@ -12,8 +12,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.mysite.easytree.Repository.GeneRepository;
+import com.mysite.easytree.Repository.ScientificNameRepository;
 import com.mysite.easytree.data.GeneDTO;
 import com.mysite.easytree.entity.Gene;
+import com.mysite.easytree.entity.ScientificName;
 import com.mysite.easytree.exception.DataNotFoundException;
 
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,8 @@ import lombok.RequiredArgsConstructor;
 public class GeneService {
 
 	private final GeneRepository geneRepository;
+	private final ScientificNameRepository scientificNameRepository;
+	private final ScientificNameService scientificNameService;
 	
 	//생성
 	public void createGene(GeneDTO geneDto) {
@@ -31,7 +35,27 @@ public class GeneService {
 		gene.setFastaTitle(geneDto.getFastaTitle());
 		gene.setDnaSequence(geneDto.getDnaSequence());
 		gene.setRegisterDay(LocalDateTime.now());
-		gene.setName(geneDto.getName());
+		
+		ScientificName name = geneDto.getName();
+		if(checkScientificName(name)) {
+			gene.setName(name);
+		}else {
+			scientificNameService.createName(name);
+		}
+		
+		this.geneRepository.save(gene);
+	}
+	
+	public void createGene(String ncbiCode, String fastaTitle, String dnaSequence, String name) {
+		Gene gene = new Gene();
+		gene.setNcbiCode(ncbiCode);
+		gene.setFastaTitle(fastaTitle);
+		gene.setDnaSequence(dnaSequence);
+		gene.setRegisterDay(LocalDateTime.now());
+		if(!checkScientificName(name)) {
+			scientificNameService.createName(name);
+		}
+		gene.setName(scientificNameRepository.findByName(name).get());
 		this.geneRepository.save(gene);
 	}
 	
@@ -63,4 +87,28 @@ public class GeneService {
 	
 	
 	//삭제
+	
+	
+	
+	//새로 등록하려고 하는 학명이 학명테이블에 있는지 확인
+	private boolean checkScientificName(ScientificName name) {
+		Optional<ScientificName> _name = this.scientificNameRepository.findByName(name.toString());
+		if(_name.isPresent())
+			return true;
+		return false;
+	}
+	
+	private boolean checkScientificName(String name) {
+		Optional<ScientificName> _name = this.scientificNameRepository.findByName(name);
+		if(_name.isPresent())
+			return true;
+		return false;
+	}
+	
+	//ncbi코드 중복 확인
+	public boolean checkNcbiCode(String ncbiCode) {
+		return this.geneRepository.existsByNcbiCode(ncbiCode);
+	}
+
+	
 }

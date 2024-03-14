@@ -4,16 +4,22 @@
 	layout:decorate="~{layouts/layout1}">
 <div layout:fragment="content">
 	<section class="container">
-		<form method="post" action="">
+		<form method="post" action="" th:object="${geneForm}">
+			<div class="alert alert-danger" role="alert" th:if="${#fields.hasAnyErrors()}">
+				<div th:each="err : ${#fields.allErrors()}" th:text="${err}" />
+			</div>
+			<div class="alert alert-danger" role="alert" th:if="${message}">
+				<div th:text="${message}" />
+			</div>
 			<div class="card bg-light mt-3">
 				<div class="card-header bg-light">
 					<div class="row">
 						<div class="col-7 text-left">
 							<label for="name" class="form-label">학명</label>
-							<input type="text" name="name" id="name" class="form-control"/>
+							<input th:field="*{name}" type="text" name="name" id="name" class="form-control"/>
 							<small>
 								<label for="ncbiCode" class="form-label">ncbi 코드</label>
-								<input type="text" name="ncbiCode" id="ncbiCode" class="form-control"/>
+								<input th:field="*{ncbiCode}" type="text" name="ncbiCode" id="ncbiCode" class="form-control"/>
 							</small>
 						</div>
 					</div>
@@ -21,11 +27,11 @@
 				<div class="card-body">
 					<p class="card-text">
 						<label for="fastaTitle" class="form-label">fasta Title</label><br>
-						<input type="text" name="fastaTitle" style="width:100%;" id="fastaTitle" class="form-control"/>
+						<input th:field="*{fastaTitle}" type="text" name="fastaTitle" style="width:100%;" id="fastaTitle" class="form-control"/>
 					</p>
 					<p class="card-text">
 						<label for="dnaSequence" class="form-label">dna 서열</label><br>
-						<textarea name="dnaSequence" style="width:100%; height:500px;" id="dnaSequence" class="form-control"></textarea>
+						<textarea th:field="*{dnaSequence}" name="dnaSequence" style="width:100%; height:500px;" id="dnaSequence" class="form-control"></textarea>
 					</p>
 				</div> 
 				<input type="submit" value="등록" class="btn btn-primary"/>

@@ -17,17 +17,14 @@ public class GeneDTO {
 	private LocalDateTime registerDay;
 	private ScientificName name;
 	
-	GeneDTO(int id, 
+	public GeneDTO(
 			String ncbiCode, 
 			String dnaSequence,
 			String fastaTitle, 
-			LocalDateTime registerDay, 
 			ScientificName name){
-		this.id = id;
 		this.ncbiCode = ncbiCode;
 		this.dnaSequence = dnaSequence;
 		this.fastaTitle = fastaTitle;
-		this.registerDay = registerDay;
 		this.name = name;
 	}
 	
