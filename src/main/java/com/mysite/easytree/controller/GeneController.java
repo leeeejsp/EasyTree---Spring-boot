@@ -1,6 +1,6 @@
 package com.mysite.easytree.controller;
 
-import java.time.LocalDateTime;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
@@ -11,8 +11,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.mysite.easytree.data.GeneDTO;
+import com.mysite.easytree.Repository.GeneRepository;
 import com.mysite.easytree.entity.Gene;
+import com.mysite.easytree.exception.DataNotFoundException;
 import com.mysite.easytree.form.GeneForm;
 import com.mysite.easytree.service.GeneService;
 
@@ -24,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 public class GeneController {
 
 	private final GeneService geneService;
+	private final GeneRepository geneRepository;
 	
 
 	@GetMapping(value = "/list")
@@ -77,6 +79,48 @@ public class GeneController {
 		return "redirect:/list";
 	}
 	
+	@GetMapping(value = "/list/{ncbiCode}/update")
+	public String geneUpdate(GeneForm geneForm, 
+			@PathVariable("ncbiCode") String ncbiCode,
+			Model model) {
+		Optional<Gene> _gene = this.geneRepository.findByNcbiCode(ncbiCode);
+		if(!_gene.isPresent()) {
+			String message = "NCBI코드가 존재하지 않습니다.";
+			model.addAttribute("message", message);
+			return "error/404";
+		}
+		Gene gene = _gene.get();
+		geneForm.setNcbiCode(gene.getNcbiCode());
+		geneForm.setFastaTitle(gene.getFastaTitle());
+		geneForm.setDnaSequence(dnaSequenceReplaceForUpdate(gene.getDnaSequence()));
+		geneForm.setName(gene.getName().toString());
+		return "form/gene_form";
+	}
+	
+	@PostMapping(value = "/list/{ncbiCode}/update")
+	public String geneUpdate(@Valid GeneForm geneForm,
+			BindingResult bindingResult,
+			@PathVariable("ncbiCode") String ncbiCode,
+			Model model) {
+		if(bindingResult.hasErrors()) {
+			return "form/gene_form";
+		}
+		//ncbi코드가 존재하는 경우
+		if(geneService.checkNcbiCode(geneForm.getNcbiCode())) { // NCBI코드가 이미 존재하는 경우 = id가 다른 경우
+			if(this.geneService.getGene(ncbiCode).getId() != 
+					this.geneService.getGene(geneForm.getNcbiCode()).getId()) {
+				String message = "NCBI코드가 이미 존재합니다.";
+				model.addAttribute("message", message);
+				return "form/gene_form";
+			}
+		}
+		this.geneService.updateGene(this.geneService.getGene(ncbiCode).getId(),
+									ncbiCode, 
+									geneForm.getFastaTitle(), 
+									geneForm.getDnaSequence(), 
+									geneForm.getName());
+		return String.format("redirect:/list/%s", ncbiCode);
+	}
 	
 	private String dnaSequenceReplace(String dnaSequence) {
 		return dnaSequence.replaceAll("\\(","\\[")
@@ -87,5 +131,7 @@ public class GeneController {
 		.replaceAll("\r\n", "<br>");
 	}
 	
-	
+	private String dnaSequenceReplaceForUpdate(String dnaSequence) {
+		return dnaSequence.replaceAll("<br>", "\r\n");
+	}
 }

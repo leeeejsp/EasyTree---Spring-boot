@@ -83,7 +83,23 @@ public class GeneService {
 		return this.geneRepository.findAll(pageable);
 	}
 	
-	//수정
+	//수정 -> id를 기반으로 수정
+	public void updateGene(int id, String ncbiCode, String fastaTitle, String dnaSequence, String name) {
+		Optional<Gene> _gene = this.geneRepository.findById(id);
+		if(!_gene.isPresent()) {
+			throw new DataNotFoundException("존재하지 않는 데이터입니다.");
+		}
+		//학명이 없는 경우
+		if(!checkScientificName(name)) {
+			this.scientificNameService.createName(name);
+		}
+		Gene gene = _gene.get();
+		gene.setNcbiCode(ncbiCode);
+		gene.setFastaTitle(fastaTitle);
+		gene.setDnaSequence(dnaSequence);
+		gene.setName(this.scientificNameRepository.findByName(name).get());
+		this.geneRepository.save(gene);
+	}
 	
 	
 	//삭제
