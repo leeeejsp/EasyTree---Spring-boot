@@ -103,7 +103,14 @@ public class GeneService {
 	
 	
 	//삭제
-	
+	public void deleteGene(String ncbiCode) {
+		Optional<Gene> _gene = this.geneRepository.findByNcbiCode(ncbiCode);
+		if(!_gene.isPresent()) {
+			throw new DataNotFoundException("존재하지 않는 데이터입니다.");
+		}
+		Gene gene = _gene.get();
+		this.geneRepository.delete(gene);
+	}
 	
 	
 	//새로 등록하려고 하는 학명이 학명테이블에 있는지 확인

@@ -17,7 +17,7 @@
 						</div>
 						<div class="col-5 text-right">
 							<a th:href="@{|/list/${gene.ncbiCode}/update|}">수정</a>
-							<a href="#">삭제</a>
+							<a th:href="@{|/list/${gene.ncbiCode}/delete|}">삭제</a>
 							<small th:text="${#temporals.format(gene.registerDay, 'yyyy-MM-dd HH:mm')}">등록날짜 들어가는 자리&nbsp;</small>
 						</div>
 						

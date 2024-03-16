@@ -34,6 +34,8 @@ public class GeneController {
 //		List<Gene> list = this.geneService.getGeneList();
 		Page<Gene> paging = this.geneService.getGeneList(page);
 		model.addAttribute("paging",paging);
+		
+		//현재 페이지 그룹의 시작 페이지
 		int startPage = (page+1) - ((page+1) - 1) % 10;
 		model.addAttribute("startPage", startPage);
 		return "list";
@@ -54,11 +56,13 @@ public class GeneController {
 		return "detail";
 	}
 	
+	//create get요청
 	@GetMapping(value = "/create")
 	public String geneCreate(GeneForm geneForm) {
 		return "form/gene_form";
 	}
 	
+	//create post요청
 	@PostMapping(value = "/create")
 	public String geneCreate(@Valid GeneForm geneForm,
 			BindingResult bindingResult, Model model) {
@@ -79,6 +83,7 @@ public class GeneController {
 		return "redirect:/list";
 	}
 	
+	//update get 요청 
 	@GetMapping(value = "/list/{ncbiCode}/update")
 	public String geneUpdate(GeneForm geneForm, 
 			@PathVariable("ncbiCode") String ncbiCode,
@@ -97,6 +102,7 @@ public class GeneController {
 		return "form/gene_form";
 	}
 	
+	//update post 요청
 	@PostMapping(value = "/list/{ncbiCode}/update")
 	public String geneUpdate(@Valid GeneForm geneForm,
 			BindingResult bindingResult,
@@ -122,6 +128,22 @@ public class GeneController {
 		return String.format("redirect:/list/%s", ncbiCode);
 	}
 	
+	//삭제 get요청
+	@GetMapping(value = "/list/{ncbiCode}/delete")
+	public String geneDelete(@PathVariable("ncbiCode") String ncbiCode,
+			Model model) {
+		model.addAttribute("ncbiCode", ncbiCode);
+		return "delete";
+	}
+	
+	//삭제 post요청
+	@PostMapping(value = "/list/{ncbiCode}/delete")
+	public String geneDelete(@PathVariable("ncbiCode") String ncbiCode) {
+		this.geneService.deleteGene(ncbiCode);
+		return "redirect:/";
+	}
+	
+	// 유전자 드로잉 자바스크립트 라이브러리가 읽지 못하는 것들 처리
 	private String dnaSequenceReplace(String dnaSequence) {
 		return dnaSequence.replaceAll("\\(","\\[")
 		.replaceAll("\\)","\\]")
@@ -131,6 +153,7 @@ public class GeneController {
 		.replaceAll("\r\n", "<br>");
 	}
 	
+	// update할때 유전자 서열들이 엔터처리 들어가도록
 	private String dnaSequenceReplaceForUpdate(String dnaSequence) {
 		return dnaSequence.replaceAll("<br>", "\r\n");
 	}
