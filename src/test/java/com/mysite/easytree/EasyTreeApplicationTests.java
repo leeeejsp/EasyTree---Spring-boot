@@ -1,5 +1,7 @@
 package com.mysite.easytree;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -10,7 +12,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import com.mysite.easytree.Repository.GeneRepository;
 import com.mysite.easytree.Repository.ScientificNameRepository;
 import com.mysite.easytree.data.GeneDTO;
+import com.mysite.easytree.entity.Gene;
 import com.mysite.easytree.entity.ScientificName;
+import com.mysite.easytree.mapper.GeneMapper;
 import com.mysite.easytree.service.GeneService;
 import com.mysite.easytree.service.ScientificNameService;
 
@@ -38,28 +42,28 @@ class EasyTreeApplicationTests {
 //	}
 	
 	// 유전자 등록 테스트
-	@Test
-	void createGene() {
-		
-		for(int i=0; i<10; i++) {
-			String name = "Pinus Densiflora";
-			String dnaSequence = "abcdabcd";
-			String fastaTitle = "testTitle";
-			String ncbiCode = "testNcbiCode" + i;
-			
-			Optional<ScientificName> sciName = this.scientificNameRepository.findByName(name);
-			if(sciName.isPresent()) {
-				GeneDTO geneDto = new GeneDTO();
-				ScientificName scientificName = sciName.get();
-				geneDto.setNcbiCode(ncbiCode);;
-				geneDto.setDnaSequence(dnaSequence);
-				geneDto.setFastaTitle(fastaTitle);
-				geneDto.setRegisterDay(LocalDateTime.now());
-				geneDto.setName(scientificName);
-				this.geneService.createGene(geneDto);
-			} 
-		}
-	}
+//	@Test
+//	void createGene() {
+//		
+//		for(int i=0; i<10; i++) {
+//			String name = "Pinus Densiflora";
+//			String dnaSequence = "abcdabcd";
+//			String fastaTitle = "testTitle";
+//			String ncbiCode = "testNcbiCode" + i;
+//			
+//			Optional<ScientificName> sciName = this.scientificNameRepository.findByName(name);
+//			if(sciName.isPresent()) {
+//				GeneDTO geneDto = new GeneDTO();
+//				ScientificName scientificName = sciName.get();
+//				geneDto.setNcbiCode(ncbiCode);;
+//				geneDto.setDnaSequence(dnaSequence);
+//				geneDto.setFastaTitle(fastaTitle);
+//				geneDto.setRegisterDay(LocalDateTime.now());
+//				geneDto.setName(scientificName);
+//				this.geneService.createGene(geneDto);
+//			} 
+//		}
+//	}
 	
 	// gene 테이블에서 학명꺼내기 테스트
 //	@Test
@@ -74,5 +78,16 @@ class EasyTreeApplicationTests {
 //	}
 	
 	
+	
+	@Test
+	void mybatisTest() {
+		String ncbiCode = "test";
+		String fastaTitle = "test";
+		String name = "test  scientific Name";
+		Gene gene = this.geneService.selectByNcbiCode(ncbiCode);
+		ScientificName sn = this.scientificNameRepository.findById(
+				Integer.parseInt(gene.getName().toString())).get();
+		assertEquals(sn.toString(),name);
+	}
 
 }

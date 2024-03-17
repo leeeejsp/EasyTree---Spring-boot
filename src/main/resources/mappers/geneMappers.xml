@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mysite.easytree.mapper.GeneMapper">
+    <select id="selectByNcbiCode" resultMap="geneResultMap" parameterType="String">
+		SELECT * FROM gene WHERE ncbi_code = #{ncbiCode}
+    </select>
+    <resultMap id="geneResultMap" type="com.mysite.easytree.entity.Gene">
+		<id property="id" column="id"/>
+        <result property="ncbiCode" column="ncbi_code"/>
+        <result property="dnaSequence" column="dna_sequence"/>
+        <result property="fastaTitle" column="fasta_title"/>
+        <result property="registerDay" column="register_day"/>
+        <association property="name" javaType="com.mysite.easytree.entity.ScientificName">
+			<result property="name" column="name_id"/>
+		</association>
+        
+	</resultMap>
+</mapper>

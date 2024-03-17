@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +18,7 @@ import com.mysite.easytree.data.GeneDTO;
 import com.mysite.easytree.entity.Gene;
 import com.mysite.easytree.entity.ScientificName;
 import com.mysite.easytree.exception.DataNotFoundException;
+import com.mysite.easytree.mapper.GeneMapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -40,6 +42,7 @@ public class GeneService {
 		if(checkScientificName(name)) {
 			gene.setName(name);
 		}else {
+			//학명이 등록되어 있지 않다면 새로 등록
 			scientificNameService.createName(name);
 		}
 		
@@ -53,6 +56,7 @@ public class GeneService {
 		gene.setDnaSequence(dnaSequence);
 		gene.setRegisterDay(LocalDateTime.now());
 		if(!checkScientificName(name)) {
+			//학명이 등록되어 있지 않다면 새로 등록
 			scientificNameService.createName(name);
 		}
 		gene.setName(scientificNameRepository.findByName(name).get());
@@ -133,5 +137,13 @@ public class GeneService {
 		return this.geneRepository.existsByNcbiCode(ncbiCode);
 	}
 
+	@Autowired
+	GeneMapper geneMapper;
+	
+	public Gene selectByNcbiCode(String ncbiCode) {
+		Gene gene =  this.geneMapper.selectByNcbiCode(ncbiCode);
+		System.out.println(gene);
+		return gene;
+	}
 	
 }
