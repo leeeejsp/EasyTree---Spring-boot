@@ -3,6 +3,8 @@ package com.mysite.easytree.controller;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -12,8 +14,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.mysite.easytree.Repository.GeneRepository;
+import com.mysite.easytree.data.GeneSearchDTO;
 import com.mysite.easytree.entity.Gene;
-import com.mysite.easytree.exception.DataNotFoundException;
 import com.mysite.easytree.form.GeneForm;
 import com.mysite.easytree.service.GeneService;
 
@@ -27,7 +29,7 @@ public class GeneController {
 	private final GeneService geneService;
 	private final GeneRepository geneRepository;
 	
-
+	/*
 	@GetMapping(value = "/list")
 	public String geneList(Model model,
 			@RequestParam(value = "page", defaultValue = "0") int page) {
@@ -38,6 +40,22 @@ public class GeneController {
 		//현재 페이지 그룹의 시작 페이지
 		int startPage = (page+1) - ((page+1) - 1) % 10;
 		model.addAttribute("startPage", startPage);
+		return "list";
+	}
+	*/
+	
+	//Mybatis적용한 검색 리스트 적용
+	@GetMapping(value = "/list")
+	public String geneList(Model model,
+			@PageableDefault(value = 10) Pageable pageable,
+			@RequestParam(value = "keyword", defaultValue = "") String keyword) {
+		Page<GeneSearchDTO> paging = this.geneService.getGeneList(pageable, keyword);
+		model.addAttribute("paging", paging);
+		//현재 페이지 그룹의 시작 페이지
+		int page = pageable.getPageNumber();
+		int startPage = (page+1) - ((page+1) - 1) % 10;
+		model.addAttribute("startPage", startPage);
+		model.addAttribute("keyword", keyword);
 		return "list";
 	}
 	

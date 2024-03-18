@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import com.mysite.easytree.Repository.GeneRepository;
 import com.mysite.easytree.Repository.ScientificNameRepository;
 import com.mysite.easytree.data.GeneDTO;
+import com.mysite.easytree.data.GeneSearchDTO;
 import com.mysite.easytree.entity.Gene;
 import com.mysite.easytree.entity.ScientificName;
 import com.mysite.easytree.exception.DataNotFoundException;
@@ -29,6 +31,7 @@ public class GeneService {
 	private final GeneRepository geneRepository;
 	private final ScientificNameRepository scientificNameRepository;
 	private final ScientificNameService scientificNameService;
+	private final GeneMapper geneMapper;
 	
 	//생성
 	public void createGene(GeneDTO geneDto) {
@@ -87,6 +90,14 @@ public class GeneService {
 		return this.geneRepository.findAll(pageable);
 	}
 	
+	// Mybatis 목록보기 페이징 적용
+	public Page<GeneSearchDTO> getGeneList(Pageable pageable, String keyword){
+		List<GeneSearchDTO> gene =  this.geneMapper.selectByNcbiCodeorFastaTitleorName(
+				keyword, keyword, keyword, pageable.getOffset(), pageable.getPageSize());
+		int count = this.geneMapper.countGene(keyword, keyword, keyword);
+		return new PageImpl<>(gene, pageable, count);
+		
+	}
 	//수정 -> id를 기반으로 수정
 	public void updateGene(int id, String ncbiCode, String fastaTitle, String dnaSequence, String name) {
 		Optional<Gene> _gene = this.geneRepository.findById(id);
@@ -137,13 +148,20 @@ public class GeneService {
 		return this.geneRepository.existsByNcbiCode(ncbiCode);
 	}
 
-	@Autowired
-	GeneMapper geneMapper;
 	
-	public Gene selectByNcbiCode(String ncbiCode) {
-		Gene gene =  this.geneMapper.selectByNcbiCode(ncbiCode);
+	
+	public List<GeneSearchDTO> selectByNcbiCode(String ncbiCode, String fastaTitle, String name,
+												int offset, int pageSize) {
+		List<GeneSearchDTO> gene =  this.geneMapper.selectByNcbiCodeorFastaTitleorName(
+				ncbiCode, fastaTitle, name, offset, pageSize);
 		System.out.println(gene);
 		return gene;
+	}
+	
+	public int countGene(String ncbiCode, String fastaTitle, String name) {
+		int count = this.geneMapper.countGene(ncbiCode, fastaTitle, name);
+		System.out.println("count="+count);
+		return count;
 	}
 	
 }
