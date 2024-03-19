@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/layout1}">
+<div layout:fragment="content">
+	<section class="container">
+		<form method="get" action="/list" class="form-inline mt-3 mb-3">
+			<input style="width:60%;" type="text" name="keyword" th:value="${keyword}"
+			class="form-control mx-1 mt-2" placeholder="학명, NCBI코드, 단백질 이름을 검색할 수 있습니다."/>
+			<button type="submit" class="btn btn-primary mx-1 mt-2">검색</button>
+			<a class="btn btn-primary mx-1 mt-2" data-toggle="modal" href="#alignmentModal">정렬결과</a>
+		</form>
+		<div class="container">
+			<div class="row">
+					<table class="table table" style="text-align: center; border: 1px solid #dddddd;">
+						<thead>
+							<tr>
+								<th colspan="3" style="background-color: #eeeeee; text-align: center;">Phylogenetic Tree&nbsp;<small>&lt;트리방식&gt;</small></th>		
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td id="svgCanvas" colspan="3" style="height: 200px; text-align: center;">
+								</td>
+							</tr>
+							<tr>
+								<td colspan="3" style="background-color: #eeeeee; text-align: center;"><strong>Newick format</strong></td>
+							</tr>
+							<tr>
+								<td colspan="3" style="height: 100px; text-align: left;">
+									Newick format 나오는 자리
+								</td>
+							</tr>
+							<tr>
+								<td colspan="3" style="height: 100px; text-align: left;">
+									실행시간 : 000ms
+								</td>
+							</tr>
+						</tbody>		
+					</table>
+					<a href="/" class="btn btn-primary">메인</a>
+					<a href="" id="downloadLink" download="newickFormatFile.txt" class="btn btn-primary mx-2">Newick format 다운로드</a>
+			</div>
+		</div>
+	</section>
+	<div class="modal fade" id="alignmentModal" tabindex="-1" role="dialog" aria-labelledby="modal" aria-hidden="true">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="modal">정렬결과</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					정렬결과
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</html>
