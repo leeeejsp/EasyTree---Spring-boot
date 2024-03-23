@@ -30,9 +30,14 @@ public class MuscleService implements GeneAnalyticsToolService{
 	public Muscle executeTool(String ncbiCodes, String dnaSequence, String kindOfTree) {
 		Muscle muscle = new Muscle();
 		
-		// 0. 현재 프로그램이 실행되고 있는 os가 무엇인지 먼저 파악 및 ncbiCodes, dnaSequence전처리
+		// 현재 프로그램이 실행되고 있는 os가 무엇인지 먼저 파악 및 
 		setMuscleOS(muscle);
+		
+		// ncbiCodes, dnaSequence전처리
 		preprocessingData(muscle, ncbiCodes, dnaSequence);
+		
+		// 트리 방식 설정
+		muscle.setKindOfTree(kindOfTree);
 		
 		// 1. 파일 생성
 		try {
@@ -42,8 +47,10 @@ public class MuscleService implements GeneAnalyticsToolService{
 		}
 		
 		// 2. 생성한 파일 기반으로 muscle실행
+		RunMuscleForAlignment(muscle);
 		
 		// 3. 정렬된 파일 기반으로 newick format파일 생성
+		RunMuscleForTree(muscle);
 		
 		// 4. 정렬된 파일 기반으로 html파일 생성
 
@@ -133,5 +140,132 @@ public class MuscleService implements GeneAnalyticsToolService{
 		muscle.setInputFileContent(selectedContent.toString() + muscle.getDnaSequence());
 	}
 	
+	// inputFile기반으로 muscle실행시켜서 alignmentFile만들기
+	private void RunMuscleForAlignment(Muscle muscle) {
+		if(muscle.getOsName().equals("window")) {
+			RunMuscleForAlignmentInWindow(muscle);
+		}else {
+			RunMuscleForAlignmentInNotWindow(muscle);
+		}
+	}
+	
+	private void RunMuscleForAlignmentInWindow(Muscle muscle) {
+		String promptCommandLine = muscle.getPath() + "muscle5 -align " + muscle.getInputFileName() + " -output " + muscle.getAlignmentFileName();
+		Process p = null;
+		try {
+			p = Runtime.getRuntime().exec(promptCommandLine);
+			
+			//행(hang)이 걸려서 무한 대기하는 것을 방지하기 위해 stream을 닫아준 후 waitFor을 쓴다.
+			p.getErrorStream().close();
+			p.getInputStream().close();
+			p.getOutputStream().close();
+			p.waitFor();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void RunMuscleForAlignmentInNotWindow(Muscle muscle) {
+		String promptCommandLine = muscle.getPath() + "muscle5 -align " + muscle.getInputFileName() + " -output " + muscle.getAlignmentFileName();
+		ProcessBuilder p;
+		try {
+			p = new ProcessBuilder(new String[] {"/bin/sh", "-c", promptCommandLine});
+			Process process = p.start();
+			process.waitFor();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+	// alignmentFile기반으로 muscle실행시켜서 treeFile만들기
+	private void RunMuscleForTree(Muscle muscle) {
+		if(muscle.getOsName().equals("window")) {
+			RunMuscleForTreeInWindow(muscle);
+		}else {
+			RunMuscleForTreeInNotWindow(muscle);
+		}
+	}
+	
+	private void RunMuscleForTreeInWindow(Muscle muscle) {
+		String promptCommandLine = null;
+		Process p = null;
+		if (muscle.getKindOfTree().equals("maximumLikelihood")) {
+			promptCommandLine = muscle.getPath() + "muscle3 -in " + muscle.getAlignmentFileName() + " -tree1 " + muscle.getTreeFileName() + " -maxiters 1";
+			try {
+				p = Runtime.getRuntime().exec(promptCommandLine);
+				
+				//행(hang)이 걸려서 무한 대기하는 것을 방지하기 위해 stream을 닫아준 후 waitFor을 쓴다.
+				p.getErrorStream().close();
+				p.getInputStream().close();
+				p.getOutputStream().close();
+				p.waitFor();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if(muscle.getKindOfTree().equals("neighborJoining")) {
+			promptCommandLine = muscle.getPath() + "muscle3 -in " + muscle.getAlignmentFileName() + " -tree1 " + muscle.getTreeFileName() + " -cluster neighborjoining";
+			try {
+				p = Runtime.getRuntime().exec(promptCommandLine);
+				
+				//행(hang)이 걸려서 무한 대기하는 것을 방지하기 위해 stream을 닫아준 후 waitFor을 쓴다.
+				p.getErrorStream().close();
+				p.getInputStream().close();
+				p.getOutputStream().close();
+				p.waitFor();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else {
+			//UPGMA일때
+			promptCommandLine = muscle.getPath() + "muscle3 -maketree -in " + muscle.getAlignmentFileName() + " -out " + muscle.getTreeFileName();
+			try {
+				p = Runtime.getRuntime().exec(promptCommandLine);
+				
+				//행(hang)이 걸려서 무한 대기하는 것을 방지하기 위해 stream을 닫아준 후 waitFor을 쓴다.
+				p.getErrorStream().close();
+				p.getInputStream().close();
+				p.getOutputStream().close();
+				p.waitFor();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+	}
+	
+	private void RunMuscleForTreeInNotWindow(Muscle muscle) {
+		String promptCommandLine = null;
+		ProcessBuilder p;
+		if (muscle.getKindOfTree().equals("maximumLikelihood")) {
+			promptCommandLine = muscle.getPath() + "muscle3 -in " + muscle.getAlignmentFileName() + " -tree1 " + muscle.getTreeFileName() + " -maxiters 1";
+			try {
+				p = new ProcessBuilder(new String[] {"/bin/sh", "-c", promptCommandLine});
+				Process process = p.start();
+				process.waitFor(); 
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (muscle.getKindOfTree().equals("neighborJoining")) {
+			promptCommandLine = muscle.getPath() + "muscle3 -maketree -in " + muscle.getAlignmentFileName() + " -out " + muscle.getTreeFileName() + " -cluster neighborjoining";
+			try {
+				p = new ProcessBuilder(new String[] {"/bin/sh", "-c", promptCommandLine});
+				Process process = p.start();
+				process.waitFor();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else { 
+			//UPGMA일때
+			promptCommandLine = muscle.getPath() + "muscle3 -maketree -in " + muscle.getAlignmentFileName() + " -out " + muscle.getTreeFileName();
+			try {
+				p = new ProcessBuilder(new String[] {"/bin/sh", "-c", promptCommandLine});
+				Process process = p.start();
+				process.waitFor();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}		
+	}
 	
 }
