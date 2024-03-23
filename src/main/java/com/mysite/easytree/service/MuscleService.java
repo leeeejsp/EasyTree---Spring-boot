@@ -1,47 +1,137 @@
 package com.mysite.easytree.service;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.mysite.easytree.Repository.GeneRepository;
+import com.mysite.easytree.entity.Gene;
+import com.mysite.easytree.exception.DataNotFoundException;
+import com.mysite.easytree.tool.Muscle;
 
+@Service
 public class MuscleService implements GeneAnalyticsToolService{
 
-	private long startTime;
-	private long endTime;
-	private String inputFileName;
-	private String inputFileContent;
-	private String alignmentFileName;
-	private String treeFileName;
-	private String htmlFileName;
-	private String path;
+	
 
 	@Autowired
 	private GeneRepository geneRepository;
 	
-	@Override
-	public void createFile() {
-		setMusclePath();
-		
-		
-	}
+	
 
+
+	
+	
 	@Override
-	public void executeTool() {
-		// TODO Auto-generated method stub
+	public Muscle executeTool(String ncbiCodes, String dnaSequence, String kindOfTree) {
+		Muscle muscle = new Muscle();
 		
+		// 0. 현재 프로그램이 실행되고 있는 os가 무엇인지 먼저 파악 및 ncbiCodes, dnaSequence전처리
+		setMuscleOS(muscle);
+		preprocessingData(muscle, ncbiCodes, dnaSequence);
+		
+		// 1. 파일 생성
+		try {
+			createFile(muscle);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		// 2. 생성한 파일 기반으로 muscle실행
+		
+		// 3. 정렬된 파일 기반으로 newick format파일 생성
+		
+		// 4. 정렬된 파일 기반으로 html파일 생성
+
+		// 5. muscle 객체 반환
+		
+		return muscle;
 	}
 
 	//유전자 분석 tool위치
-	private void setMusclePath() {
+	private void setMuscleOS(Muscle muscle) {
 		String osName = System.getProperty("os.name").toLowerCase();
 		if(osName.contains("win")) {
 			// 윈도우에서 실행할 경우
-			path = "C:\\Users\\이종섭\\Documents\\workspace-spring-tool-suite-4-4.19.1.RELEASE\\EasyTree\\src\\main\\resources\\static\\muscle\\";
+			muscle.setOsName("window");
 		}
 		else {
-			// 서버에 배포했을때(우분투) 실행할 경우
-			// 진짜로 배포할 시 손 좀 봐야함
-			path = "";
+			// 윈도우가 아닌 환경에서 프로그램이 실행될 경우
+			muscle.setOsName("notWindow");
+			muscle.setPath("");
 		}
 	}
+	
+	// ncbiCodes, dnaSequence전처리
+	private void preprocessingData(Muscle muscle, String ncbiCodes, String dnaSequence) {
+		muscle.setNcbiCodes(ncbiCodes.split(","));
+		
+		muscle.setDnaSequence(
+		dnaSequence.replaceAll("\\(","\\[")
+					.replaceAll("\\)","\\]")
+					.replaceAll(",","_")
+					.replaceAll(";","")
+					.replaceAll("'","")
+					.replaceAll("<br>","\r\n") + "\r\n");
+		
+	}
+	
+	// 넘겨받은 데이터를 기반으로 파일생성
+	private void createFile(Muscle muscle) throws IOException {
+		String fileName = LocalDateTime.now()
+								.toString()
+								.replaceAll(":", "_")
+								.replaceAll(" ", "_");
+		
+		// 파일 이름 설정하기
+		muscle.setInputFileName(muscle.getPath() + fileName + "_input.txt");
+		muscle.setAlignmentFileName(muscle.getPath() + fileName + "_align.txt");
+		muscle.setTreeFileName(muscle.getPath() + fileName + "_tree.txt");
+		muscle.setHtmlFileName(muscle.getPath() + fileName + "_html.txt");
+		
+		// 하나의 inputFileContent 만들기
+		getFasta(muscle);
+		
+		// 하나의 inputFile 만들기
+		FileWriter fin = null;
+		try {
+			fin = new FileWriter(muscle.getInputFileName());
+			fin.write(muscle.getInputFileContent());
+	
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			fin.close();
+		}
+		
+	}
+	
+	// 사용자가 선택한 데이터와 직접 입력한 데이터를 하나의 내용으로 합친다.
+	private void getFasta(Muscle muscle) {
+		String[] selectedCodes = muscle.getNcbiCodes();
+		StringBuilder selectedContent = new StringBuilder();
+		for(String ncbiCode : selectedCodes) {
+			Optional<Gene> _gene = geneRepository.findByNcbiCode(ncbiCode);
+			if(_gene.isEmpty()) {
+				throw new DataNotFoundException("존재하지 않는 ncbiCode가 있습니다.");
+			}
+			Gene gene = _gene.get();
+			selectedContent.append(
+					gene.getDnaSequence()
+					.replaceAll("\\(","\\[")
+					.replaceAll("\\)","\\]")
+					.replaceAll(",","_")
+					.replaceAll(";","")
+					.replaceAll("'","")
+					.replaceAll("<br>","\r\n") + "\r\n"
+					);
+		}
+		muscle.setInputFileContent(selectedContent.toString() + muscle.getDnaSequence());
+	}
+	
+	
 }
