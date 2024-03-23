@@ -30,8 +30,12 @@ public class Muscle implements GeneAnalyticsTool {
 	private String alignmentFileName;
 	private String alignmentFileContent;
 	private String treeFileName;
-	private String treeFileContent;
 	private String htmlFileName;
+	
+	// 결과 내용
+	private String treeFileContent;
 	private String htmlFileContent;
+	private String insertIntoJS;
+	private String downloadNewick;
 	
 }

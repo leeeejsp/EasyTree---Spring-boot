@@ -1,9 +1,12 @@
 package com.mysite.easytree.service;
 
+import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Scanner;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,21 +19,15 @@ import com.mysite.easytree.tool.Muscle;
 @Service
 public class MuscleService implements GeneAnalyticsToolService{
 
-	
-
 	@Autowired
 	private GeneRepository geneRepository;
-	
-	
-
-
-	
 	
 	@Override
 	public Muscle executeTool(String ncbiCodes, String dnaSequence, String kindOfTree) {
 		Muscle muscle = new Muscle();
 		
-		// 현재 프로그램이 실행되고 있는 os가 무엇인지 먼저 파악 및 
+		// 현재 프로그램이 실행되고 있는 os가 무엇인지 먼저 파악 및 작업 시간 측정 시작
+		start(muscle);
 		setMuscleOS(muscle);
 		
 		// ncbiCodes, dnaSequence전처리
@@ -55,9 +52,27 @@ public class MuscleService implements GeneAnalyticsToolService{
 		// 4. 정렬된 파일 기반으로 html파일 생성
 		RunMuscleForHTML(muscle);
 		
-		// 5. muscle 객체 반환
+		// 5. muscle 객체 반환하기 전 각각의 fileContent를 저장하고 있어야함
+		readMuscleFiles(muscle);
+		end(muscle);
+		
+		// 6. 만들었던 파일들 삭제
+		deleteMuscleFiles(muscle);
+		System.out.println(muscle.getInsertIntoJS());
 		
 		return muscle;
+	}
+	
+	// 작업 시간 측정 메소드 start, end
+	private void start(Muscle muscle) {
+		long startTime = System.currentTimeMillis(); //코드 실행 전에 시간 받아오기
+		muscle.setStartTime(startTime);
+	}
+	
+	private void end(Muscle muscle) {
+		long endTime = System.currentTimeMillis();
+		muscle.setEndTime(endTime);
+		muscle.setWaitingTime(endTime - muscle.getStartTime());
 	}
 
 	//유전자 분석 tool위치
@@ -302,6 +317,82 @@ public class MuscleService implements GeneAnalyticsToolService{
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private void readMuscleFiles(Muscle muscle) {
+		// newick format file 읽기
+		readMuscleTreeFile(muscle);
+		
+		// 다중시퀀스 정렬 html file 읽기
+		readMuscleHTMLFile(muscle);
+	}
+	
+	private void readMuscleTreeFile(Muscle muscle) {
+		String treeFileName = muscle.getTreeFileName();
+		try {
+			File file = new File(treeFileName);
+			FileReader fr = new FileReader(file); 
+			Scanner scan = new Scanner(fr);
+			StringBuilder newickContent = new StringBuilder();
+			while(scan.hasNextLine()) {
+				newickContent.append(scan.nextLine() + "<br>");
+			}
+			scan.close();
+			muscle.setTreeFileContent(newickContent.toString());
+			muscle.setInsertIntoJS(newickContent.toString().replaceAll("<br>",""));
+			muscle.setDownloadNewick("'" + newickContent.toString().replaceAll("<br>","") + "'");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void readMuscleHTMLFile(Muscle muscle) {
+		String htmlFileName = muscle.getHtmlFileName();
+		try {
+			File file = new File(htmlFileName);
+			FileReader fr = new FileReader(file); 
+			Scanner scan = new Scanner(fr);
+			String content = "";
+			while(scan.hasNextLine()) {
+				content += scan.nextLine() + "<br>";
+			}
+			scan.close();
+			muscle.setHtmlFileContent(content);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	// 유전자 분석을 위해 만들었던 파일들 삭제 
+	private void deleteMuscleFiles(Muscle muscle) {
+		String inputFileName = muscle.getInputFileName();
+		String alignmentFileName = muscle.getAlignmentFileName();
+		String treeFileName = muscle.getTreeFileName();
+		String htmlFileName = muscle.getHtmlFileName();
+		
+		try {
+			File inputFile = new File(inputFileName);
+			if(inputFile.exists()) {
+				inputFile.delete();
+			}
+			
+			File alignmentFile = new File(alignmentFileName);
+			if(alignmentFile.exists()) {
+				alignmentFile.delete();
+			}
+			
+			File treeFile = new File(treeFileName);
+			if(treeFile.exists()) {
+				treeFile.delete();
+			}
+			File htmlFile = new File(htmlFileName);
+			if(htmlFile.exists()) {
+				htmlFile.delete();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 	}
 	
 }
