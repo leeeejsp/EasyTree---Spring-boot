@@ -53,7 +53,8 @@ public class MuscleService implements GeneAnalyticsToolService{
 		RunMuscleForTree(muscle);
 		
 		// 4. 정렬된 파일 기반으로 html파일 생성
-
+		RunMuscleForHTML(muscle);
+		
 		// 5. muscle 객체 반환
 		
 		return muscle;
@@ -266,6 +267,41 @@ public class MuscleService implements GeneAnalyticsToolService{
 				e.printStackTrace();
 			}
 		}		
+	}
+	
+	// alignmentFile기반으로 html파일을 만드려고함
+	private void RunMuscleForHTML (Muscle muscle) {
+		if(muscle.getOsName().equals("window")) {
+			RunMuscleForHTMLInWindow(muscle);
+		}else {
+			RunMuscleForHTMLInNotWindow(muscle);
+		}
+	}
+	
+	private void RunMuscleForHTMLInWindow (Muscle muscle) {
+		String promptCommandLine = muscle.getPath() + "muscle3 -in " + muscle.getAlignmentFileName() + " -htmlout " + muscle.getHtmlFileName();
+		Process p = null;
+		try {
+			p = Runtime.getRuntime().exec(promptCommandLine);
+			
+			//행(hang)이 걸려서 무한 대기하는 것을 방지하기 위해 stream을 닫아준 후 waitFor을 쓴다.
+			p.getErrorStream().close();
+			p.getInputStream().close();
+			p.getOutputStream().close();
+			p.waitFor();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void RunMuscleForHTMLInNotWindow (Muscle muscle) {
+		String promptCommandLine = muscle.getPath() + "muscle3 -in " + muscle.getAlignmentFileName() + " -htmlout " + muscle.getHtmlFileName();
+		try {
+			Process p1 = Runtime.getRuntime().exec(new String[] {"/bin/sh", "-c", promptCommandLine});
+			p1.waitFor();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 }

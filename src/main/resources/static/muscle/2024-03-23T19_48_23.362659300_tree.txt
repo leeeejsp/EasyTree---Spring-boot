@@ -1,0 +1,6 @@
+(
+ABY65904.1 alpha-pinene synthase [Pinus tabuliformis]:0.825
+,
+AAA93371.1 PM4_ partial [Pinus radiata]:0.825
+)
+;

@@ -1,0 +1,18 @@
+>ABY65904.1 alpha-pinene synthase [Pinus tabuliformis]
+MSPVSVISLPSHLCLPTSFIDRSGRELNHLHITIPNVAMRRQGKLMTGASMSMNLRTAVSDDAVIRRRGDFHSNLWDDDL
+IQSLSSPYGEPSYRERAERLIGEVKNSFNSTSNEDGESITPLDDLIQRFGWVDSVERLGIDRHFKKEIKSALDHVYRYWS
+EKGIGCGRESVVTDLNSTALGLRTLRLHGYDVSADVLNHFKNQGGQFACTLKRTEDQIRTVLNLYRASLIAFPGEKVMDE
+AETFSVKYLEEALQKIPVSSLSREIEDVLEYGRHTYLPRLEARNYMDVFGQDTENSKSYMKTEKLLELAMLEFNIFHALQ
+KRELEYLVRWWKGTSSPQMTFCRHRHVEYYTLASCIAFEPQHSGFRLGFAKACHIITVLDDMYDTFGTLDELELFTSAIK
+RWDPSATECLPEYMKGVYVIVYNTVNEMSQEVDKAQGRGTLNYCRQAWEEYIDAYMQEAKWIASGEVPTFEEYYENGKVS
+SGHRVSALQPILTTDIPFPEHVLKEVDIPSKLNDLASAILRLRGDTRCYQADRARGEEASCTSCYMKDNPGTTEEDALNH
+INAMISDVVKGLNWELLKPNSSVPISAKKHAFDISRAFHYSYKYRDGYSVASIETKSLVKRTVIDPVTL
+>AAA93371.1 PM4_ partial [Pinus radiata]
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+----------------XXVTFCKRRN------------------------------------------------------
+----------------------------------------------------------------------------GLLK
+KAYELSVLX-----------------------------------------------------------------------
+-------------------------------------------------------------------XA
