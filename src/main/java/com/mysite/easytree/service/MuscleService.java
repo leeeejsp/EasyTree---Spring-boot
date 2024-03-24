@@ -23,7 +23,7 @@ public class MuscleService implements GeneAnalyticsToolService{
 	private GeneRepository geneRepository;
 	
 	@Override
-	public Muscle executeTool(String ncbiCodes, String dnaSequence, String kindOfTree) {
+	public Muscle executeTool(String ncbiCodes, String dnaSequence, String kindOfTree) throws IOException {
 		Muscle muscle = new Muscle();
 		
 		// 현재 프로그램이 실행되고 있는 os가 무엇인지 먼저 파악 및 작업 시간 측정 시작
@@ -37,20 +37,16 @@ public class MuscleService implements GeneAnalyticsToolService{
 		muscle.setKindOfTree(kindOfTree);
 		
 		// 1. 파일 생성
-		try {
-			createFile(muscle);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		createFile(muscle);
 		
 		// 2. 생성한 파일 기반으로 muscle실행
-		RunMuscleForAlignment(muscle);
+		runMuscleForAlignment(muscle);
 		
 		// 3. 정렬된 파일 기반으로 newick format파일 생성
-		RunMuscleForTree(muscle);
+		runMuscleForTree(muscle);
 		
 		// 4. 정렬된 파일 기반으로 html파일 생성
-		RunMuscleForHTML(muscle);
+		runMuscleForHTML(muscle);
 		
 		// 5. muscle 객체 반환하기 전 각각의 fileContent를 저장하고 있어야함
 		readMuscleFiles(muscle);
@@ -157,15 +153,15 @@ public class MuscleService implements GeneAnalyticsToolService{
 	}
 	
 	// inputFile기반으로 muscle실행시켜서 alignmentFile만들기
-	private void RunMuscleForAlignment(Muscle muscle) {
+	private void runMuscleForAlignment(Muscle muscle) {
 		if(muscle.getOsName().equals("window")) {
-			RunMuscleForAlignmentInWindow(muscle);
+			runMuscleForAlignmentInWindow(muscle);
 		}else {
-			RunMuscleForAlignmentInNotWindow(muscle);
+			runMuscleForAlignmentInNotWindow(muscle);
 		}
 	}
 	
-	private void RunMuscleForAlignmentInWindow(Muscle muscle) {
+	private void runMuscleForAlignmentInWindow(Muscle muscle) {
 		String promptCommandLine = muscle.getPath() + "muscle5 -align " + muscle.getInputFileName() + " -output " + muscle.getAlignmentFileName();
 		Process p = null;
 		try {
@@ -181,7 +177,7 @@ public class MuscleService implements GeneAnalyticsToolService{
 		}
 	}
 	
-	private void RunMuscleForAlignmentInNotWindow(Muscle muscle) {
+	private void runMuscleForAlignmentInNotWindow(Muscle muscle) {
 		String promptCommandLine = muscle.getPath() + "muscle5 -align " + muscle.getInputFileName() + " -output " + muscle.getAlignmentFileName();
 		ProcessBuilder p;
 		try {
@@ -195,15 +191,15 @@ public class MuscleService implements GeneAnalyticsToolService{
 	
 	
 	// alignmentFile기반으로 muscle실행시켜서 treeFile만들기
-	private void RunMuscleForTree(Muscle muscle) {
+	private void runMuscleForTree(Muscle muscle) {
 		if(muscle.getOsName().equals("window")) {
-			RunMuscleForTreeInWindow(muscle);
+			runMuscleForTreeInWindow(muscle);
 		}else {
-			RunMuscleForTreeInNotWindow(muscle);
+			runMuscleForTreeInNotWindow(muscle);
 		}
 	}
 	
-	private void RunMuscleForTreeInWindow(Muscle muscle) {
+	private void runMuscleForTreeInWindow(Muscle muscle) {
 		String promptCommandLine = null;
 		Process p = null;
 		if (muscle.getKindOfTree().equals("maximumLikelihood")) {
@@ -250,7 +246,7 @@ public class MuscleService implements GeneAnalyticsToolService{
 		
 	}
 	
-	private void RunMuscleForTreeInNotWindow(Muscle muscle) {
+	private void runMuscleForTreeInNotWindow(Muscle muscle) {
 		String promptCommandLine = null;
 		ProcessBuilder p;
 		if (muscle.getKindOfTree().equals("maximumLikelihood")) {
@@ -285,15 +281,15 @@ public class MuscleService implements GeneAnalyticsToolService{
 	}
 	
 	// alignmentFile기반으로 html파일을 만드려고함
-	private void RunMuscleForHTML (Muscle muscle) {
+	private void runMuscleForHTML (Muscle muscle) {
 		if(muscle.getOsName().equals("window")) {
-			RunMuscleForHTMLInWindow(muscle);
+			runMuscleForHTMLInWindow(muscle);
 		}else {
-			RunMuscleForHTMLInNotWindow(muscle);
+			runMuscleForHTMLInNotWindow(muscle);
 		}
 	}
 	
-	private void RunMuscleForHTMLInWindow (Muscle muscle) {
+	private void runMuscleForHTMLInWindow (Muscle muscle) {
 		String promptCommandLine = muscle.getPath() + "muscle3 -in " + muscle.getAlignmentFileName() + " -htmlout " + muscle.getHtmlFileName();
 		Process p = null;
 		try {
@@ -309,7 +305,7 @@ public class MuscleService implements GeneAnalyticsToolService{
 		}
 	}
 	
-	private void RunMuscleForHTMLInNotWindow (Muscle muscle) {
+	private void runMuscleForHTMLInNotWindow (Muscle muscle) {
 		String promptCommandLine = muscle.getPath() + "muscle3 -in " + muscle.getAlignmentFileName() + " -htmlout " + muscle.getHtmlFileName();
 		try {
 			Process p1 = Runtime.getRuntime().exec(new String[] {"/bin/sh", "-c", promptCommandLine});
